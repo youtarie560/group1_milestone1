@@ -1,0 +1,314 @@
+# Data
+*.npy
+*.npz
+*.tar.gz
+*.pkl
+*.json
+*.csv
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,pycharm,sublimetext,vim,windows,macos,linux,jetbrain,eclipse
+# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,pycharm,sublimetext,vim,windows,macos,linux,jetbrain,eclipse
+
+### Eclipse ###
+# http://help.eclipse.org/stable/index.jsp?topic=/org.eclipse.platform.doc.user/tasks/tasks-15.htm
+
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.project
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored launch configurations
+.launches/
+
+# CDT-specific
+.cproject
+
+# JDT-specific
+.classpath
+
+# Java annotation processor (APT)
+.apt_generated/
+
+# STS (Spring Tool Suite)
+.springBeans
+
+# Code Recommenders
+.recommenders/
+
+# Annotation Processing Tool (APT)
+.apt_generated/
+.factorypath
+
+# Scala IDE
+.cache-main
+.scala_dependencies
+.worksheet
+
+
+### JetBrains ###
+# Covers PyCharm, IntelliJ, WebStorm, Android Studio, etc.
+.idea/
+*.iws
+*.iml
+*.ipr
+
+
+### Linux ###
+*~
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on external disk
+.Trash-*
+
+
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must be committed
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+
+### PyCharm ###
+# Covers JetBrains IDEs, see https://www.jetbrains.com/help/pycharm/specific-folders-that-are-created-for-projects-and-are-not-covered-by-the-general-jetbrains-rule.html
+
+# User-specific stuff
+.idea/shelf/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/vcs.xml
+.idea/pyre.xml
+.idea/spellchecker.xml
+
+# Local History
+.idea/localInsightSettings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/runConfigurations/
+.idea/libraries/
+.idea/sbt.xml
+
+# PyCharm Edu
+.idea/courseauth.xml
+
+# venv
+.idea/VirtualEnvironment/
+
+
+### SublimeText ###
+# Cache files for Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+
+### Vim ###
+# Swap
+[._]*.s[a-v][a-z]
+!*.svg  # comment out if you don't need vector files
+[._]*.sw[a-p]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+# Auto-generated tag files
+tags
+
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+
+### Windows ###
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+
+# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,pycharm,sublimetext,vim,windows,macos,linux,jetbrain,eclipse
