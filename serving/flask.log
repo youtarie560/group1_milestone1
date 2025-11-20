@@ -1,0 +1,58 @@
+2025-11-19 17:31:45,554 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.49.224.152:5000
+2025-11-19 17:31:45,554 INFO: [33mPress CTRL+C to quit[0m
+2025-11-19 17:32:12,508 INFO: 127.0.0.1 - - [19/Nov/2025 17:32:12] "GET /logs HTTP/1.1" 200 -
+2025-11-19 17:32:12,534 INFO: 127.0.0.1 - - [19/Nov/2025 17:32:12] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-19 17:32:29,354 INFO: Request received to load model: clf_angle
+2025-11-19 17:32:29,354 INFO: Found model file locally in root: clf_angle.pkl
+2025-11-19 17:32:35,928 INFO: Successfully loaded model: clf_angle version 1.0.0 from clf_angle.pkl
+2025-11-19 17:32:35,932 INFO: 127.0.0.1 - - [19/Nov/2025 17:32:35] "POST /download_registry_model HTTP/1.1" 200 -
+2025-11-19 17:33:33,050 ERROR: Prediction logic failed: X has 2 features, but LogisticRegression is expecting 1 features as input.
+2025-11-19 17:33:33,050 INFO: 127.0.0.1 - - [19/Nov/2025 17:33:33] "[35m[1mPOST /predict HTTP/1.1[0m" 500 -
+2025-11-19 17:34:25,508 INFO: Request received to load model: clf_dist_angle
+2025-11-19 17:34:25,508 INFO: Found model file locally in root: clf_dist_angle.pkl
+2025-11-19 17:34:25,525 INFO: Successfully loaded model: clf_dist_angle version 1.0.0 from clf_dist_angle.pkl
+2025-11-19 17:34:25,532 INFO: 127.0.0.1 - - [19/Nov/2025 17:34:25] "POST /download_registry_model HTTP/1.1" 200 -
+2025-11-19 17:34:47,632 INFO: 127.0.0.1 - - [19/Nov/2025 17:34:47] "POST /predict HTTP/1.1" 200 -
+2025-11-19 21:04:00,371 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.68.146:5000
+2025-11-19 21:04:00,376 INFO: [33mPress CTRL+C to quit[0m
+2025-11-19 21:04:19,298 INFO: Request received to load model: clf_dist_angle
+2025-11-19 21:04:19,298 INFO: Found model file locally in root: clf_dist_angle.pkl
+2025-11-19 21:04:20,608 INFO: Successfully loaded model: clf_dist_angle version 1.0.0 from clf_dist_angle.pkl
+2025-11-19 21:04:20,610 INFO: 127.0.0.1 - - [19/Nov/2025 21:04:20] "POST /download_registry_model HTTP/1.1" 200 -
+2025-11-19 21:04:47,061 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.68.146:5000
+2025-11-19 21:04:47,061 INFO: [33mPress CTRL+C to quit[0m
+2025-11-19 21:04:50,759 INFO: Request received to load model: clf_dist_angle
+2025-11-19 21:04:50,759 INFO: Found model file locally in root: clf_dist_angle.pkl
+2025-11-19 21:04:51,438 INFO: Successfully loaded model: clf_dist_angle version 1.0.0 from clf_dist_angle.pkl
+2025-11-19 21:04:51,438 INFO: 127.0.0.1 - - [19/Nov/2025 21:04:51] "POST /download_registry_model HTTP/1.1" 200 -
+2025-11-19 21:05:05,461 INFO: Request received to load model: clf_dist_angle
+2025-11-19 21:05:05,462 INFO: Found model file locally in root: clf_dist_angle.pkl
+2025-11-19 21:05:05,462 INFO: Successfully loaded model: clf_dist_angle version 1.0.0 from clf_dist_angle.pkl
+2025-11-19 21:05:05,462 INFO: 127.0.0.1 - - [19/Nov/2025 21:05:05] "POST /download_registry_model HTTP/1.1" 200 -
+2025-11-19 21:06:47,321 INFO: 127.0.0.1 - - [19/Nov/2025 21:06:47] "[33mGET / HTTP/1.1[0m" 404 -
+2025-11-19 21:06:47,369 INFO: 127.0.0.1 - - [19/Nov/2025 21:06:47] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-19 21:06:57,705 INFO: 127.0.0.1 - - [19/Nov/2025 21:06:57] "GET /logs HTTP/1.1" 200 -
+2025-11-19 21:06:57,727 INFO: 127.0.0.1 - - [19/Nov/2025 21:06:57] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-19 21:10:20,760 INFO: Request received to load model: clf_dist_angle
+2025-11-19 21:10:20,760 INFO: Found model file locally in root: clf_dist_angle.pkl
+2025-11-19 21:10:20,760 INFO: Successfully loaded model: clf_dist_angle version 1.0.0 from clf_dist_angle.pkl
+2025-11-19 21:10:20,760 INFO: 127.0.0.1 - - [19/Nov/2025 21:10:20] "POST /download_registry_model HTTP/1.1" 200 -
+2025-11-19 21:10:20,777 INFO: 127.0.0.1 - - [19/Nov/2025 21:10:20] "POST /predict HTTP/1.1" 200 -
+2025-11-19 21:10:20,796 INFO: 127.0.0.1 - - [19/Nov/2025 21:10:20] "GET /logs HTTP/1.1" 200 -
+2025-11-19 21:13:42,260 INFO: Request received to load model: clf_dist_angle
+2025-11-19 21:13:42,260 INFO: Found model file locally in root: clf_dist_angle.pkl
+2025-11-19 21:13:42,260 INFO: Successfully loaded model: clf_dist_angle version 1.0.0 from clf_dist_angle.pkl
+2025-11-19 21:13:42,260 INFO: 127.0.0.1 - - [19/Nov/2025 21:13:42] "POST /download_registry_model HTTP/1.1" 200 -
+2025-11-19 21:13:42,267 INFO: 127.0.0.1 - - [19/Nov/2025 21:13:42] "POST /predict HTTP/1.1" 200 -
+2025-11-19 21:13:42,286 INFO: 127.0.0.1 - - [19/Nov/2025 21:13:42] "GET /logs HTTP/1.1" 200 -
+2025-11-19 21:14:26,148 INFO: 127.0.0.1 - - [19/Nov/2025 21:14:26] "GET /logs HTTP/1.1" 200 -
+2025-11-19 21:14:26,183 INFO: 127.0.0.1 - - [19/Nov/2025 21:14:26] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
