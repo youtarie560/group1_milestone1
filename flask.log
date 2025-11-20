@@ -1,0 +1,10 @@
+2025-11-19 12:58:24,324 INFO: Serving on http://0.0.0.0:8080
+2025-11-19 17:27:24,536 INFO: Serving on http://0.0.0.0:8080
+2025-11-19 17:28:39,922 INFO: Request received to load model: SUPER_FAKE_MODEL
+2025-11-19 17:28:39,922 WARNING: Could not find or download model: SUPER_FAKE_MODEL
+2025-11-19 17:30:34,202 INFO: Request received to load model: clf_dist_angle
+2025-11-19 17:30:34,202 WARNING: Could not find or download model: clf_dist_angle
+2025-11-19 17:30:52,541 INFO: Request received to load model: clf_angle
+2025-11-19 17:30:52,541 WARNING: Could not find or download model: clf_angle
+2025-11-19 17:32:26,438 INFO: Request received to load model: clf_angle
+2025-11-19 17:32:26,438 WARNING: Could not find or download model: clf_angle
