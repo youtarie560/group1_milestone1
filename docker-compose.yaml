@@ -1,0 +1,29 @@
+# docker-compose.yml
+version: '3'
+
+services:
+  serving:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.serving
+    image: ift6758/serving
+    container_name: serving-service
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - FLASK_LOG=flask.log
+
+  streamlit:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.streamlit
+    image: ift6758/streamlit
+    container_name: streamlit-service
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_URL=http://serving:8080
+    depends_on:
+      - serving
