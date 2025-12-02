@@ -1,7 +1,3 @@
-"""
-If you are in the same directory as this file (app.py), you can run run the app using gunicorn:
-    $ gunicorn --bind 0.0.0.0:8080 app:app
-"""
 import os
 import json
 from pathlib import Path
@@ -10,12 +6,17 @@ from flask import Flask, jsonify, request, abort
 import pandas as pd
 import joblib
 from typing import Optional, Dict, Union, Tuple, List, Any
-import numpy as np
+import wandb
 
 LOG_FILE = os.environ.get("FLASK_LOG", "flask.log")
+from dotenv import load_dotenv
+
+load_dotenv()
 
 MODEL = None
-MODEL_INFO = {"workspace": "default", "model": "None", "version": "0.0"}
+MODEL_INFO = {"workspace": "default",
+              "model": "None",
+              "version": "0.0"}
 
 app = Flask(__name__)
 
@@ -23,7 +24,6 @@ app = Flask(__name__)
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
 def load_model(path: Path, info: Dict[str, str]) -> Tuple[Optional[Any], str]:
-    """Helper function to safely load a model from disk."""
     try:
         model = joblib.load(path)
         log_message = f"Successfully loaded model: {info['model']} version {info['version']} from {path}"
@@ -39,31 +39,21 @@ def logs():
         with open(LOG_FILE, 'r') as f:
             log_content: List[str] = f.readlines()
     except FileNotFoundError:
-        log_content = [f"ERROR: Log file not found at {LOG_FILE}"]
+        log_content = [f"[ERROR] Log file not found at {LOG_FILE}"]
     except Exception as e:
-        log_content = [f"ERROR: Failed to read log file: {e}"]
+        log_content = [f"[ERROR] Failed to read log file: {e}"]
     return jsonify({"logs": log_content})
+
 
 @app.route("/download_registry_model", methods=["POST"])
 def download_registry_model():
     """
-    Handles POST requests made to http://IP_ADDRESS:PORT/download_registry_model
-
-    The comet API key should be retrieved from the ${COMET_API_KEY} environment variable.
-
-    Recommend (but not required) json with the schema:
-
-        {
-            workspace: (required),
-            model: (required),
-            version: (required),
-            ... (other fields if needed) ...
-        }
-
+    Handles POST requests to change the model.
+    STRICT MODE: Only allows 'Distance' and 'DistanceAngle'.
     """
     global MODEL, MODEL_INFO
+    current_model_name = MODEL_INFO.get("model", "None")
 
-    # 1. Parse Request
     try:
         json_data = request.get_json(force=True)
     except Exception:
@@ -75,89 +65,150 @@ def download_registry_model():
 
     workspace = json_data.get("workspace", "")
     model_name = json_data.get("model", "")
-    version = json_data.get("version", "")
 
     app.logger.info(f"Request received to load model: {model_name}")
 
-    # 2. Find the Model File
-    model_path = None
+    valid_models = {
+        "Distance": {
+            "run_name": "LogisticRegression_Logistic Regression (Distance)",
+            "filename": "Logistic Regression (Distance)_logreg_model.pkl"
+        },
+        "DistanceAngle": {
+            "run_name": "LogisticRegression_Logistic Regression (Distance+Angle)",
+            "filename": "Logistic Regression (Distance+Angle)_logreg_model.pkl"
+        }
+    }
 
-    # STRATEGY A: Check Root Directory (Local .pkl files)
-    # This is what you need right now since your files are next to app.py
-    local_root_file = Path(f"{model_name}.pkl")
-    if local_root_file.exists():
-        app.logger.info(f"Found model file locally in root: {local_root_file}")
-        model_path = local_root_file
+    if model_name not in valid_models:
+        msg = f"Invalid model '{model_name}'. Current model set back to {current_model_name}."
+        app.logger.warning(msg)
+        return jsonify({
+            "status": "failed",
+            "message": f"Invalid model '{model_name}'. Allowed models: 'Distance', 'DistanceAngle'"
+        }), 400
 
-    # STRATEGY B: Check Registry Cache (Comet/WandB folder structure)
-    # else:
-    #     app.logger.info(f"Model {model_name} not found in root. Checking Registry Cache...")
-    #     model_path = RegistryClient.check_local_model(workspace, model_name, version)
-    #
-    #     # STRATEGY C: Download (Simulated for now)
-    #     if model_path is None:
-    #          model_path = RegistryClient.download_model(workspace, model_name, version)
+    # Retrieve the specific config for the valid model
+    target_config = valid_models[model_name]
+    run_name = target_config["run_name"]
+    expected_filename = target_config["filename"]
+    model_path = Path(expected_filename)
 
-    # 3. Load the Model
-    response = {"status": "failed", "message": "Model not found."}
+    if model_path.exists():
+        app.logger.info(f"Model file {model_path} found locally.")
 
-    if model_path and model_path.exists():
         new_model, log_msg = load_model(model_path, json_data)
-        app.logger.info(log_msg)
 
         if new_model:
             MODEL = new_model
             MODEL_INFO.update(json_data)
-            response = {
+            app.logger.info(f"Model successfully changed from {current_model_name} to {model_name}.")
+            return jsonify({
                 "status": "success",
-                "message": f"Model {model_name} version {version} loaded successfully."
-            }
-    else:
-        app.logger.warning(f"Could not find or download model: {model_name}")
-        response["message"] = f"Failed to find model {model_name}. Keeping current model."
+                "message": f"Model {model_name} found locally and loaded successfully."
+            })
+        else:
+            app.logger.error(f"File exists but failed to load. Current model set back to {current_model_name}.")
+            return jsonify({"status": "failed", "message": "File exists locally but failed to load."}), 500
 
-    return jsonify(response)
+    # ---------------------------------------------------------
+    # STEP 3: Download from WandB (If not found locally)
+    # ---------------------------------------------------------
+    app.logger.info(f"Model {model_name} not found locally. Attempting download from WandB...")
+
+    try:
+        key = os.getenv("API_KEY")
+        if not key:
+            raise ValueError("API_KEY not set.")
+
+        wandb.login(key=key)
+        api = wandb.Api()
+        ENTITY = "IFT67582025A1"
+        PROJECT = "IFT6758.2025-A01"
+        path_to_check = f"{ENTITY}/{PROJECT}"
+
+        runs = api.runs(path_to_check)
+        run = next((r for r in runs if r.name == run_name), None)
+
+        if not run:
+            raise Exception(f"Run '{run_name}' not found in project '{path_to_check}'")
+
+        run.file(expected_filename).download(root=".", replace=True)
+
+        app.logger.info(f"Successfully downloaded {expected_filename} from WandB.")
+
+    except Exception as e:
+        app.logger.error(f"WandB download failed for '{model_name}'. Current model set back to {current_model_name}. Error: {str(e)}")
+        return jsonify({
+            "status": "failed",
+            "message": f"Download failed. Keeping current model ({MODEL_INFO.get('model')}). Error: {str(e)}"
+        }), 500
+
+    if model_path.exists():
+        new_model, log_msg = load_model(model_path, json_data)
+
+        if new_model:
+            MODEL = new_model
+            MODEL_INFO.update(json_data)
+            app.logger.info(f"Model successfully changed from {current_model_name} to {model_name}.")
+
+            return jsonify({
+                "status": "success",
+                "message": f"Model {model_name} downloaded from WandB and loaded successfully."
+            })
+    app.logger.error(f"Unknown error (file missing after download). Current model set back to {current_model_name}.")
+    return jsonify({"status": "failed", "message": "Unknown error: File not found after download."}), 500
+
 
 @app.route("/predict", methods=["POST"])
 def predict():
     """
     Handles POST requests to predict goal probability.
     """
-    global MODEL
+    global MODEL, MODEL_INFO
 
     if MODEL is None:
         app.logger.error("Prediction attempted without loaded model.")
         return jsonify({"status": "error", "message": "No model loaded. Call /download_registry_model first."}), 503
 
-    # 1. Parse Data
     try:
         json_data = request.get_json(force=True)
-        # Note: orient='columns' expects {"col1": {0: val, 1: val}, "col2": ...}
         input_df = pd.read_json(json.dumps(json_data), orient='columns')
     except Exception as e:
         app.logger.error(f"Data parsing failed: {e}")
-        return jsonify({"status": "error", "message": "Invalid Data Format. Use df.to_json(orient='columns')."}), 400
+        return jsonify({"status": "error", "message": "Invalid Data Format"}), 400
 
-    # 2. Feature Selection
-    # Default to distance/angle if model name isn't specific, or check columns
-    features = ['distanceToNet', 'shotAngle']
+    model_name = MODEL_INFO.get("model", "")
 
-    # Check if features exist in input
-    if not all(col in input_df.columns for col in features):
-         return jsonify({"status": "error", "message": f"Input data must contain columns: {features}"}), 400
+    predictions = []
 
-    # 3. Predict
     try:
-        X = input_df[features]
-        predictions = MODEL.predict_proba(X)[:, 1]
+        if model_name == "Distance":
+            if 'distanceToNet' not in input_df.columns:
+                raise ValueError("Missing feature: distanceToNet")
+
+            X = input_df[['distanceToNet']]
+            predictions = MODEL.predict_proba(X)[:, 1]
+
+        elif model_name == "DistanceAngle":
+            required = ['distanceToNet', 'shotAngle']
+            if not all(col in input_df.columns for col in required):
+                raise ValueError(f"Missing features. Required: {required}")
+
+            X = input_df[required]
+            predictions = MODEL.predict_proba(X)[:, 1]
+
+        else:
+            msg = f"Model type '{model_name}' not supported by feature selector."
+            app.logger.error(msg)
+            return jsonify({"status": "error", "message": msg}), 400
 
         response_df = pd.DataFrame({"expected_goal_prob": predictions.round(4)})
         return jsonify({"predictions": response_df.to_json(orient='records')})
 
     except Exception as e:
-        app.logger.error(f"Prediction logic failed: {e}")
+        app.logger.error(f"Prediction Error: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
 if __name__ == "__main__":
-    # Running in debug mode for development
     app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
