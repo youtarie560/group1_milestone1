@@ -153,8 +153,3 @@ class LiveGameClient:
         return np.where(cond_home_shooter | cond_away_shooter, 1, 0)
 
 
-if __name__ == '__main__':
-    client = LiveGameClient("2016020411")
-    df_for_model = client.ping_game()
-    print(df_for_model.head())
-
