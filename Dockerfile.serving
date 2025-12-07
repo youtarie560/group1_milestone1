@@ -1,0 +1,29 @@
+# To build a container, you will use the docker build command
+# https://docs.docker.com/engine/reference/commandline/build/
+#
+#   docker build -t <IMAGE TAG> -f Dockerfile.serving .
+#   docker build -t <IMAGE TAG> -f Dockerfile.jupyter .
+#
+
+
+# https://docs.docker.com/engine/reference/builder/#from
+# You shouldn't need to change this
+FROM python:3.7
+
+# https://docs.docker.com/engine/reference/builder/#workdir
+# Create and cd into /code as your working directory
+WORKDIR /code
+
+#add code, optionally a default model if you want
+ADD serving/ /code/serving/
+
+#install libs
+ADD ift6758/requirements.txt /code/requirements.txt
+RUN pip install --no-cache-dir -r /code/requirements.txt
+
+#expose ports (or do this in docker-compose)
+EXPOSE 5000
+
+#specify default command - this is not required because you can always specify the command
+#either with the docker run command or in the docker-compose file
+CMD ["gunicorn","--bind","0.0.0.0:5000","serving.app:app"]

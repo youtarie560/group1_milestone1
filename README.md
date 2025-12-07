@@ -1,277 +1,304 @@
-# IFT6758 Blog Post Template
+# IFT6758 Repo Template
 
-This blog post template is based off of the [Lanyon](https://github.com/poole/lanyon) template (the original readme can be found at the bottom).
+This template provides you with a skeleton of a Python package that can be installed into your local machine.
+This allows you access your code from anywhere on your system if you've activated the environment the package was installed to.
+You are encouraged to leverage this package as a skeleton and add all of your reusable code, functions, etc. into relevant modules.
+This makes collaboration much easier as the package could be seen as a "single source of truth" to pull data, create visualizations, etc. rather than relying on a jumble of notebooks.
+You can still run into trouble if branches are not frequently merged as work progresses, so try to not let your branches diverge too much!
 
+Also included in this repo is an image of the NHL ice rink that you can use in your plots.
+It has the correct location of lines, faceoff dots, and length/width ratio as the real NHL rink.
+Note that the rink is 200 feet long and 85 feet wide, with the goal line 11 feet from the nearest edge of the rink, and the blue line 75 feet from the nearest edge of the rink.
 
+<p align="center">
+<img src="./figures/nhl_rink.png" alt="NHL Rink is 200ft x 85ft." width="400"/>
+<p>
+
+The image can be found in [`./figures/nhl_rink.png`](./figures/nhl_rink.png).
 
 ## Installation
 
-### Ubuntu
+**Note: this is slightly different than the original rep you were working in!**
 
-1. Install Ruby (I'm using v3.2.5)
+To install this package, first setup your Python environment (next section), and then simply run
 
-```bash
-sudo apt install ruby-full
-```
+    pip install -e ift6758
 
-2. Once installed, add the following to your `.bashrc` or whatever terminal startup script you may use:
+assuming you are running this from the root directory of this repo. 
 
-```bash
-export GEM_HOME="$HOME/.gem"
-export PATH="$HOME/.gem/bin:$PATH"
-```
+## Docker
 
-3. Install bundler:
+Follow the instructions [here](https://docs.docker.com/get-docker/) to install Docker on your system.
+Included in this repo is a Dockerfile with brief explanations of the commands you will need to use
+to use to define your Docker image.
+One thing to note is that its generally a better idea to stick to using `pip` instead of Conda
+environments in Docker containers, as this approach is generally more lightweight than Conda.
+A common pattern is to copy the `requirements.txt` file into the docker container and then simply 
+do `pip install -r requirements.txt` (done in the Dockerfile).
+You can also copy an entire Python package (e.g. the `ift6758/` folder) into the container, and also
+do a simple `pip install -e ift6758/` (also from the Dockerfile).
 
-```bash
-gem install jekyll bundler
-```
+In addition, below are a list of useful docker commands that you will likely need.
 
-4. Install dependencies:
-
-From within this repository's root directory, run:
-
-```
-bundle install
-```
-
-### MacOS and Windows
-
-Mac and Windows users can find relevant guides for installing Jekyll here:
-
-- [Windows guide](https://jekyllrb.com/docs/installation/windows/)
-- [MacOS guide](https://jekyllrb.com/docs/installation/macos/)
-
-Additionally, you will need to do a few steps in Windows before serving you are able to serve your page locally. The steps below are Windows only, and you won't need them if you're on a Linux based machine. 
-
-### Windows Specific Steps:
-
-Before running these, you'd want to make sure your Ruby and Jekyll installations are functional.
-
-1. From within the repository's root directory, run: 
-
-```
-bundle add webrick
-```
-
-2. Open the `gemfile` present in the root directory of the repository, and add the following line at the end of the file: 
-
-```
-gem 'wdm', '>= 0.1.0'
-```
-
-3. Run the following command in the same directory: 
-
-```
-gem install wdm
-```
-
-You should be able to serve the page locally on Windows after these steps. 
-
-## Serving the Page Locally
-
-Once you've installed jekyll and all of the dependencies, you can now serve the webpage on your local machine for development purposes using the `jekyll serve` command, using bundle to handle any dependencies.
-In your terminal, from the directory containing the Jekyll project run:
+### docker build ([ref](https://docs.docker.com/engine/reference/commandline/build/))
+Builds a docker image directly the local Dockerfile (in the same directory):
 
 ```bash
-bundle exec jekyll serve
+# docker build -t <TAG>:<VERSION> .
+# eg: 
+docker build -t ift6758/serving:1.0.0 .
 ```
 
-You should see something along the lines of:
+### docker images ([ref](https://docs.docker.com/engine/reference/commandline/images/))
 
-```
-> bundle exec jekyll serve
-Configuration file: /home/USER/ift6758-blog-template/_config.yml
-            Source: /home/USER/ift6758-blog-template
-       Destination: /home/USER/ift6758-blog-template/_site
- Incremental build: disabled. Enable with --incremental
-      Generating... 
-                    done in 0.661 seconds.
- Auto-regeneration: enabled for '/home/USER/ift6758-blog-template'
-    Server address: http://127.0.0.1:4000/
-  Server running... press ctrl-c to stop.
+Lists all images that are built.
+
+
+### docker run ([ref](https://docs.docker.com/engine/reference/commandline/run/))
+To run the docker image you just created, you could run:
+
+```bash
+#  docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+docker run -it --expose 127.0.0.1:8890:8890/tcp --env DOCKER_ENV_VAR=$LOCAL_ENV_VAR ift6758/serving:0.0.1 
 ```
 
-If you see this, you've successfully served your web page locally!
-You can access it at server address specified, in this case `http://127.0.0.1:4000/`.
+In this example, `-it --expose 127.0.0.1:8890:8890/tcp --env DOCKER_ENV_VAR=$LOCAL_ENV_VAR` are the
+`[OPTIONS]`, `ift6758/serving:0.0.1` is the `IMAGE`, and there are no `[COMMAND]` or `[ARG...]`.
+If you run this command the docker container will run whatever you specified at the `CMD` in your 
+Dockerfile; if this is not specified or it crashes, your container will immediately stop.
+You could alternatively specify a different command; for example setting `[COMMAND]` to `bash` will
+drop you into a bash shell in the container. 
+From there you can poke around to potentially debug your app.
 
-## Configuration
+Some useful run options are:
 
-You will find some basic configurations that you will need to modify in the [`_config.yml`](./_config.yml) file found in the repo's root directory.
-You should modify the title, tagline, and description to something more appropriate, as well as update the author information.
-Be careful with the urls however, as this can break things if you're not careful!
+- `-it`: Allocate a pseudo TTY connected to the container's STDIN (i.e. interactive mode)
+- `-p/--expose`: Expose port (e.g. `-p 127.0.0.1:80:8080/tcp` binds port `8080` of the container TCP port `80` on `127.0.0.1` of the host machine.
+- `-e/--env`: Set environment variable (e.g. `-e DOCKER_ENV_VAR=${LOCAL_ENV_VAR}`)
+- `-d/--detach`: runs container in the background
 
-If you'd like to make your blog posts wider (i.e. have the content span a wider area of the page), you can modify this setting on line 85 of [`public/css/lanyon.css`](./public/css/lanyon.css).
-Feel free to experiment with sizes that you prefer.
+The documentation for all of these can be found in the [official Docker docs](https://docs.docker.com/engine/reference/commandline/run)
 
-## Creating Content
+### docker ps ([ref](https://docs.docker.com/engine/reference/commandline/ps/))
 
-All posts are defined as markdown files in the [`_posts/`](./_posts/) directory of this repository, and they must follow the naming convention of `YYYY-MM-DD-postname.md`.
-The date is automatically parsed from the filename and embedded into the post.
-Checkout the post found in `./_posts/2021-09-17-ift6758-demo.md` for an example which embeds interactive HTML figures generated with [Plotly](https://plotly.com/python/interactive-html-export/).
+Lists running containers.
+For example, if you did a `docker run` command in detached mode (with the `-d` flag), your container
+will be running in the background.
+To verify that your container is running, you could run `docker ps`: 
 
-As submission for the milestones, you're expected to create a single blogpost entry containing all of the answers and figures for all of the questions.
-Create a file `./_posts/YYYY-MM-DD-milestone-1.md` and use a layout like the following:
-
-```md
----
-layout: post
-title: Milestone 1
----
-
-## Question 1
-
-...content...
-
-## Question 2
-
-...content...
+```bash
+> docker ps
+CONTAINER ID   IMAGE                   COMMAND   CREATED         STATUS         PORTS                      NAMES
+0237661ace81   ift6758/serving:0.0.1   "bash"    4 seconds ago   Up 3 seconds   127.0.0.1:8890->8890/tcp   sleepy_jang
 ```
 
-Make sure that its obvious where each answer to the questions are!
+### docker exec ([ref](https://docs.docker.com/engine/reference/commandline/exec/))
 
-<br>
-<br>
-<br>
+This runs a command in the container.
+You could use this to drop into a shell in a detached but running container, eg:
 
-___
-*The following content is the original Lanyon Readme file.*
-___
-<br>
-<br>
-<br>
-
-# Lanyon
-
-Lanyon is an unassuming [Jekyll](http://jekyllrb.com) theme that places content first by tucking away navigation in a hidden drawer. It's based on [Poole](http://getpoole.com), the Jekyll butler.
-
-![Lanyon](https://f.cloud.github.com/assets/98681/1825266/be03f014-71b0-11e3-9539-876e61530e24.png)
-![Lanyon with open sidebar](https://f.cloud.github.com/assets/98681/1825267/be04a914-71b0-11e3-966f-8afe9894c729.png)
-
-
-## Contents
-
-- [Usage](#usage)
-- [Options](#options)
-  - [Sidebar menu](#sidebar-menu)
-  - [Themes](#themes)
-  - [Reverse layout](#reverse-layout)
-- [Development](#development)
-- [Author](#author)
-- [License](#license)
-
-
-## Usage
-
-Lanyon is a theme built on top of [Poole](https://github.com/poole/poole), which provides a fully furnished Jekyll setup—just download and start the Jekyll server. See [the Poole usage guidelines](https://github.com/poole/poole#usage) for how to install and use Jekyll.
-
-
-## Options
-
-Lanyon includes some customizable options, typically applied via classes on the `<body>` element.
-
-
-### Sidebar menu
-
-Create a list of nav links in the sidebar by assigning each Jekyll page the correct layout in the page's [front-matter](http://jekyllrb.com/docs/frontmatter/).
-
-```
----
-layout: page
-title: About
----
+```bash
+> docker exec -it sleepy_jang bash
+root@0237661ace81:/code# 
 ```
 
-**Why require a specific layout?** Jekyll will return *all* pages, including the `atom.xml`, and with an alphabetical sort order. To ensure the first link is *Home*, we exclude the `index.html` page from this list by specifying the `page` layout.
+### docker network ([ref](https://docs.docker.com/engine/reference/commandline/network/))
 
+Allows you to ping your docker network. You can do:
 
-### Themes
-
-Lanyon ships with eight optional themes based on the [base16 color scheme](https://github.com/chriskempson/base16). Apply a theme to change the color scheme (mostly applies to sidebar and links).
-
-![Lanyon with red theme](https://f.cloud.github.com/assets/98681/1825270/be065110-71b0-11e3-9ed8-9b8de753a4af.png)
-![Lanyon with red theme and open sidebar](https://f.cloud.github.com/assets/98681/1825269/be05ec20-71b0-11e3-91ea-a9138ef07186.png)
-
-There are eight themes available at this time.
-
-![Available theme classes](https://f.cloud.github.com/assets/98681/1817044/e5b0ec06-6f68-11e3-83d7-acd1942797a1.png)
-
-To use a theme, add any one of the available theme classes to the `<body>` element in the `default.html` layout, like so:
-
-```html
-<body class="theme-base-08">
-  ...
-</body>
+```bash
+> docker network ls
+NETWORK ID     NAME                 DRIVER    SCOPE
+15742e644eb4   bridge               bridge    local
+60c57e381d21   host                 host      local
 ```
 
-To create your own theme, look to the Themes section of [included CSS file](https://github.com/poole/lanyon/blob/master/public/css/lanyon.css). Copy any existing theme (they're only a few lines of CSS), rename it, and change the provided colors.
+to see all of your existing networks.
+If you didn't build with docker compose, chances are your running containers are living on the
+`bridge` network.
+You can then do:
 
-
-### Reverse layout
-
-![Lanyon with reverse layout](https://f.cloud.github.com/assets/98681/1825265/be03f2e4-71b0-11e3-89f1-360705524495.png)
-![Lanyon with reverse layout and open sidebar](https://f.cloud.github.com/assets/98681/1825268/be056174-71b0-11e3-88c8-5055bca4307f.png)
-
-Reverse the page orientation with a single class.
-
-```html
-<body class="layout-reverse">
-  ...
-</body>
+```bash
+> docker network inspect bridge
+...
+"Containers": {                                                                                                                                                                                             
+            "<...some id...>": {                                                                                                                                   
+                "Name": "sleepy_jang",                                                                                                                                                                          
+                "EndpointID": "...",
+                "MacAddress": "...",
+                "IPv4Address": "172.17.0.1",  #  <--- this is the ip of the container on the docker network!
+                "IPv6Address": ""
+            }
+...
 ```
 
+or any other network you may want to inspect to get more information about the containers attached.
+For example, you can find the IP of a container by the NAMES.
+This is the IP of the container on the **docker network**; i.e. if you were trying to make an
+HTTP request from *within* the docker network, rather than from your local host.
+This may be useful to you for debugging the final part of Milestone 3, where you will put
+your jupyter notebook into a container and then query the prediction service that lives in another
+docker container.
 
-### Sidebar overlay instead of push
+**Note when using docker compose**
 
-Make the sidebar overlap the viewport content with a single class:
+Docker compose does some nice name resolution stuff for you by default.
+You'll notice the format of a `docker-compose.yaml` file is along the lines of:
 
-```html
-<body class="sidebar-overlay">
-  ...
-</body>
+```yaml
+services:
+    service1:
+        ...
+    service2:
+        ...
 ```
 
-This will keep the content stationary and slide in the sidebar over the side content. It also adds a `box-shadow` based outline to the toggle for contrast against backgrounds, as well as a `box-shadow` on the sidebar for depth.
+Say your jupyter notebook lives in `service2`, and you want to make an HTTP request to `service1`.
+You actually don't need to look for the container IP of `service1` - you can simply make an 
+HTTP request to `http://service1:PORT/endpoint`.
+The name resolution is taken care for you if you're using docker compose (but you do need to keep
+track of the port).
 
-It's also available for a reversed layout when you add both classes:
+### docker-compose ([ref](https://docs.docker.com/compose/))
 
-```html
-<body class="layout-reverse sidebar-overlay">
-  ...
-</body>
+_The following is taken directly from the docker compose reference_
+
+Compose is a tool for defining and running multi-container Docker applications. 
+With Compose, you use a YAML file to configure your application’s services. 
+Then, with a single command, you create and start all the services from your configuration.
+
+Using Compose is basically a three-step process:
+
+- Define your app’s environment with a Dockerfile so it can be reproduced anywhere.
+- Define the services that make up your app in docker-compose.yml so they can be run together in an isolated environment.
+- Run `docker-compose up` and the Docker compose command starts and runs your entire app.
+
+Install it with:
+
+```bash
+pip install docker-compose
 ```
 
-### Sidebar open on page load
+You can then simply do `docker-compose up` to build and run the application that you sepcified in
+the `docker-compose.yaml` file.
 
-Show an open sidebar on page load by modifying the `<input>` tag within the `sidebar.html` layout to add the `checked` boolean attribute:
 
-```html
-<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox" checked>
+## Flask
+
+To run the app, if you are in the same directory as `app.py`, you can run the app from the command 
+line using gunicorn (Unix) or waitress (Unix + Windows):
+    
+```bash
+gunicorn --bind 0.0.0.0:<PORT> app:app
+
+# or
+
+waitress-serve --listen=0.0.0.0:<PORT> app:app
+```
+Gunicorn or waitress can be installed via:
+
+```bash
+pip install gunicorn
+
+# or
+
+pip install waitress
 ```
 
-Using Liquid you can also conditionally show the sidebar open on a per-page basis. For example, here's how you could have it open on the homepage only:
+At this point, you can test the app with existing training/validation data that you used in 
+Milestone 2, and ping the app directly using the Python requests library, eg: 
 
-```html
-<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox" {% if page.title =="Home" %}checked{% endif %}>
+```Python
+X = get_input_features_df()
+r = requests.post("http://0.0.0.0:<PORT>/predict", json=json.loads(X.to_json()))
+print(r.json())
 ```
 
-## Development
+## Streamlit
 
-Lanyon has two branches, but only one is used for active development.
+Streamlit can be installed using:
+```Bash
+pip install streamlit
+```
 
-- `master` for development.  **All pull requests should be to submitted against `master`.**
-- `gh-pages` for our hosted site, which includes our analytics tracking code. **Please avoid using this branch.**
+A template streamlit app is provided in `streamlit_app.py`. Feel free to deviate from the template (especially if going for the bonus).
+
+Once you've setup your environment, your Streamlit app can be run using:
+```Bash
+streamlit run streamlit_app.py
+```
+
+The above command should start the app and give the IP/port where it is running. Custom IP/ports can be specified using the `--server.address IP` and `--server.port PORT` flags respectively. Additional flags can be found [here](https://docs.streamlit.io/library/advanced-features/cli).
+
+To make changes to the app, simply change the `streamlit_app.py` script and reload the webpage to see the changes!
 
 
-## Author
+## Environments
 
-**Mark Otto**
-- <https://github.com/mdo>
-- <https://twitter.com/mdo>
+The first thing you should setup is your isolated Python environment.
+You can manage your environments through either Conda or pip.
+Both ways are valid, just make sure you understand the method you choose for your system.
+It's best if everyone on your team agrees on the same method, or you will have to maintain both environment files!
+Instructions are provided for both methods.
+
+**Note**: If you are having trouble rendering interactive plotly figures and you're using the pip + virtualenv method, try using Conda instead.
+
+### Conda 
+
+**Note: it is better to stick with pip environments in Docker containers!**
+
+Conda uses the provided `environment.yml` file.
+You can ignore `requirements.txt` if you choose this method.
+Make sure you have [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual) installed on your system.
+Once installed, open up your terminal (or Anaconda prompt if you're on Windows).
+Install the environment from the specified environment file:
+
+    conda env create --file environment.yml
+    conda activate ift6758-conda-env
+
+After you install, register the environment so jupyter can see it:
+
+    python -m ipykernel install --user --name=ift6758-conda-env
+
+You should now be able to launch jupyter and see your conda environment:
+
+    jupyter-lab
+
+If you make updates to your conda `environment.yml`, you can use the update command to update your existing environment rather than creating a new one:
+
+    conda env update --file environment.yml    
+
+You can create a new environment file using the `create` command:
+
+    conda env export > environment.yml
+
+### Pip + Virtualenv
+
+An alternative to Conda is to use pip and virtualenv to manage your environments.
+This may play less nicely with Windows, but works fine on Unix devices.
+This method makes use of the `requirements.txt` file; you can disregard the `environment.yml` file if you choose this method.
+
+Ensure you have installed the [virtualenv tool](https://virtualenv.pypa.io/en/latest/installation.html) on your system.
+Once installed, create a new virtual environment:
+
+    vitualenv ~/ift6758-venv
+    source ~/ift6758-venv/bin/activate
+
+Install the packages from a requirements.txt file:
+
+    pip install -r requirements.txt
+
+As before, register the environment so jupyter can see it:
+
+    python -m ipykernel install --user --name=ift6758-venv
+
+You should now be able to launch jupyter and see your conda environment:
+
+    jupyter-lab
+
+If you want to create a new `requirements.txt` file, you can use `pip freeze`:
+
+    pip freeze > requirements.txt
 
 
-## License
 
-Open sourced under the [MIT license](LICENSE.md).
-
-<3

@@ -1,0 +1,28 @@
+# docker-compose.yml
+version: '3'
+
+services:
+  serving:
+    build:
+      context: .
+      dockerfile: Dockerfile.serving
+    container_name: serving-service
+    image: ift6758/serving
+    ports:
+      - "5000:5000"
+    environment:
+      WANDB_API_KEY: fbe2d0aad81c2ed1f8e2852a2c48e6f74bae90b5
+  streamlit-service:
+      build:
+        context: .
+        dockerfile: Dockerfile.streamlit
+      container_name: streamlit-service
+      image: ift6758/streamlit
+      ports:
+       - "8501:8501"
+      depends_on:
+        - serving
+
+      
+
+     
