@@ -11,7 +11,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      WANDB_API_KEY: fbe2d0aad81c2ed1f8e2852a2c48e6f74bae90b5
+      WANDB_API_KEY:
   streamlit-service:
       build:
         context: .

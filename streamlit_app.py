@@ -4,9 +4,8 @@ import os
 import requests
 import streamlit as st
 import pandas as pd
-import numpy as np
-from flask import request
-from streamlit import session_state, container
+import plotly.express as px
+from streamlit import session_state, container, pyplot
 from ift6758.ift6758.data.front_end_data import FrontEndData
 
 st.set_page_config(layout="wide")
@@ -92,8 +91,33 @@ with (container()):
                          st.write(f"↓ {diff: .1f}" if diff < 0 else f" ↑({df['awayGoals'].iloc[0]})")
 
                      st.subheader("Data used for predictions")
-                     df_show = df[['gameId', 'eventId', 'period', 'timeInPeriod','distanceToNet', 'shotAngle', 'is_goal', 'is_empty_net','team','xg']]
-                     st.dataframe(df_show,use_container_width=True)
+                     st.session_state.data = df[['gameId', 'eventId', 'period', 'timeInPeriod','distanceToNet', 'shotAngle', 'is_goal', 'is_empty_net','team','xg']]
+                     st.dataframe(st.session_state.data,use_container_width=True)
+
+
+                     st.subheader("Bonus")
+                     percentage_shoot_expected = st.session_state.data['xg'].sum()/st.session_state.data['is_goal'].sum()
+                     col1,col2,col3 = st.columns(3)
+
+                     col1.metric("Shots Total:",len(st.session_state.data))
+                     col2.metric("Goals Total:",st.session_state.data['is_goal'].sum())
+                     col3.metric("Expected Shooting:" ,f"{percentage_shoot_expected*100: .2f}%")
+
+                     count_shots = pd.DataFrame()
+                     count_shots['shot_types'] = st.session_state.data.apply(lambda x: "goal" if x.is_goal== 1 else ("shot on goal" if x.xg > 0 else "missed"),axis=1)
+
+                     count_shots = count_shots['shot_types'].value_counts().reset_index()
+                     count_shots.columns = ["shot_types","count"]
+
+
+                     pie = px.pie(count_shots, names="shot_types",values='count',hole=0.6,color='shot_types',
+                                  color_discrete_map={
+                                      "Goal": "green",
+                                      "Missed": "red",
+                                      "Shot On Goal": "blue",
+                                  })
+                     pie.update_layout(title="Distribution of shots",showlegend=True)
+                     st.plotly_chart(pie, use_container_width=True)
             except Exception as e:
                 st.error(e)
 
