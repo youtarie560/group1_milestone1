@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 from live_game_event import LiveGameClient
 import os
+import plotly.express as px
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:5000")
 
 st.set_page_config(page_title="Milestone 3 - NHL xG Dashboard",
@@ -123,3 +124,27 @@ if st.button("Ping game"):
 
         st.subheader("All shot events")
         st.dataframe(st.session_state['all_shots'])
+
+        st.subheader("Bonus")
+        percentage_shoot_expected = st.session_state['all_shots']['xg'].sum() / st.session_state['all_shots']['is_goal'].sum()
+        col1, col2, col3 = st.columns(3)
+
+        col1.metric("Shots Total:", len(st.session_state['all_shots']))
+        col2.metric("Goals Total:", st.session_state['all_shots']['is_goal'].sum())
+        col3.metric("Expected Shooting:", f"{percentage_shoot_expected * 100: .2f}%")
+
+        count_shots = pd.DataFrame()
+        count_shots['shot_types'] = st.session_state['all_shots'].apply(
+            lambda x: "goal" if x.is_goal == 1 else ("shot on goal" if x.xg > 0 else "missed"), axis=1)
+
+        count_shots = count_shots['shot_types'].value_counts().reset_index()
+        count_shots.columns = ["shot_types", "count"]
+
+        pie = px.pie(count_shots, names="shot_types", values='count', hole=0.6, color='shot_types',
+                     color_discrete_map={
+                         "Goal": "green",
+                         "Missed": "red",
+                         "Shot On Goal": "blue",
+                     })
+        pie.update_layout(title="Distribution of shots", showlegend=True)
+        st.plotly_chart(pie, use_container_width=True)
