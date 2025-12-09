@@ -6,6 +6,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ift6758/ ./ift6758/
 RUN pip install -e ./ift6758
 COPY serving/ ./serving/
-COPY serving/clf_dist_angle.pkl .
 EXPOSE 8080
 CMD ["gunicorn", "--bind", "0.0.0.0:8080", "serving.app:app"]
